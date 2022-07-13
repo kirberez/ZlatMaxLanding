@@ -1,0 +1,259 @@
+.wrapper {
+}
+.header {
+}
+.top-header__container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 10px 0;
+  min-height: 50px;
+}
+.header__top {
+  padding: 10px 0;
+  color: #fff;
+  background-color: $mainDarkColor;
+}
+.header__body {
+}
+.header__catalog {
+}
+.footer__container {
+}
+.top-header__menu {
+  flex: 1 1 auto;
+}
+.top-header__user {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+}
+
+.top-header__user::before {
+  font-size: rem(28);
+  margin-right: em(15, 28);
+}
+
+.icon-menu {
+	display: none;
+	@media (max-width: 768px) {
+		display: block;
+		position: relative;
+		flex: 0 0 30px;
+		height: rem(18);
+		cursor: pointer;
+		z-index: 5;
+		span,
+		&::before,
+		&::after {
+			content: "";
+			transition: all 0.3s ease 0s;
+			right: 0;
+			position: absolute;
+			width: 100%;
+			height: rem(2);
+			background-color: #fff;
+		}
+		&::before {
+			top: 0;
+		}
+		&::after {
+			bottom: 0;
+		}
+		span {
+			top: calc(50% - rem(1));
+		}
+		.menu-open & {
+			span {
+				width: 0;
+			}
+			&::before,
+			&::after {
+			}
+			&::before {
+				top: calc(50% - rem(1));
+				transform: rotate(-45deg);
+			}
+			&::after {
+				bottom: calc(50% - rem(1));
+				transform: rotate(45deg);
+			}
+		}
+	}
+}
+.menu__body {
+
+}
+.menu__list {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 5px;
+  @include adaptiveValue("column-gap", 60, 20);
+}
+.menu__item {
+}
+.menu__link {
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+.body-header {
+  padding: 10px 0;
+  background-color: #ecf1f2;
+  // .body-header__container
+  &__container {
+    display: flex;
+    align-items: center;
+    min-height: 70px;
+
+  }
+  // .body-header__logo
+  &__logo {}
+  // .body-header__search
+  &__search {
+    flex: 1 1 auto;
+    padding-right: 20px;
+    @include adaptiveValue("padding-left", 158, 20);
+  }
+  // .body-header__actions
+  &__actions {}
+}
+// ._icon-logo
+._icon-logo {
+  font-size: 42px;
+  color: $mainDarkColor;
+}
+.search-header {
+  position: relative;
+  max-width: 377px;
+  background-color: #ecf1f2;
+  border: 1px solid rgba(4, 4, 4, 0.5);
+  border-radius: 3px;
+  // .search-header__button
+  &__button {
+    position: absolute;
+    top: 0;
+    left: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 41px;
+    height: 41px;
+    background-color: transparent;
+    font-size: 14px;
+  }
+  // .search-header__input
+  &__input {
+    padding: 0 20px 0 50px;
+    height: 41px;
+    width: 100%;
+    color: $mainColor;
+    background-color: transparent;
+    border-radius: 3px;
+    &::placeholder {
+      color: rgba(0, 0, 0, 0.5);
+    }
+  }
+}
+.actions-header {
+}
+
+.body-header {
+  // .body-header__actions
+  &__actions {}
+}
+.actions-header {
+  display: flex;
+  align-items: center;
+  column-gap: 30px;
+  // .actions-header__location
+  &__location {
+    display: inline-flex;
+    align-items: center;
+    font-weight: 600;
+    &::before {
+      font-size: 24px;
+      margin: 0 em(10, 24) 0 0;
+    }
+
+  }
+  // .actions-header__phones
+  &__phones {}
+  // .actions-header__favorite
+  &__favorite {
+    font-size: 27px;
+  }
+  // .actions-header__cart
+  &__cart {}
+}
+// ._icon-arrow-down
+._icon-arrow-down {}
+// ._icon-favs
+._icon-favs {}
+// ._icon-cart
+._icon-cart {}
+
+.phones-header {
+  // .phones-header__items
+  &__items {}
+  // .phones-header__item
+  &__item {
+    position: relative;
+    display: flex;
+  }
+  // .phones-header__phone
+  &__phone {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 22px;
+    white-space: nowrap;
+  }
+  // .phones-header__arrow
+  &__arrow {
+    margin-left: 17px;
+    height: 18px;
+    color: #e8aa31;
+    font-size: 10px;
+    transition: all .3s ease-in-out;
+    &._spoller-active {
+      transform: rotate(-180deg);
+    }
+  }
+  // .phones-header__list
+  &__list {
+    margin-top: 5px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    padding: 15px;
+    width: 100%;
+    border-radius: 10px;
+    background-color: #fff;
+    li {
+      &:not(:last-child) {
+        margin-bottom: em(8, 18);
+      }
+    }
+  }
+  // .phones-header__callback
+  &__callback {
+    margin-top: 3px;
+    color: #e8aa31;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 22px;
+  }
+}
+.cart-header {
+  // .cart-header__icon
+  &__icon {}
+  // .cart-header__body
+  &__body {}
+  // .cart-header__summ
+  &__summ {}
+  // .cart-header__link
+  &__link {}
+}
