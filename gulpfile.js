@@ -1,30 +1,15 @@
-// // **************************
-// // Подключение и экспорт списка общих плагинов для задач GULP
-// // Импортируем модули
-// import notify from "gulp-notify";
-// import newer from "gulp-newer";
-// import plumber from "gulp-plumber";
-// import ifPlugin from "gulp-if";
-// import prettier from "gulp-prettier";
-// import rename from 'gulp-rename';
-// // Экспортируем объект
-// export const plugins = {
-// 	notify,
-// 	if: ifPlugin,
-// 	prettier,
-// 	newer,
-// 	plumber,
-// 	rename
-// };
+import { createRequire } from "module"; // to use import/export and require in same file
+const require = createRequire(import.meta.url);
 
 // В эту папку будет собираться проект, Эта папка (С названием проекта) передаётся на сервер заказчику 
-let project_folder = require("path").basename(__dirname);
+let project_folder = './zlatmaxGulp'
+console.log(project_folder)
 // Имя папки с иходниками
-let source_folder="src";
+let source_folder="./src";
 let fs = require('fs');
 
 // Пути до файлов:
-let path={
+const path={
   build: {
     html: project_folder + "/",
     css: project_folder + "/css/",
@@ -83,6 +68,7 @@ let { src, dest } = require('gulp'),
   ttf2woff2 = require('gulp-ttf2woff2'),
   fonter = require('gulp-fonter'),
   newer = require('gulp-newer');
+  // webpack = require('webpack-stream'); // Webpack gulp
 
 
 // *****************************
@@ -159,7 +145,7 @@ function js() {
         extname: ".min.js" // Делаем копию файла (удобно читать)
       })
     )
-    .pipe(dest(path.build.js)) // 2. Несём в path.build.css ВТОРОЙ раз
+    .pipe(dest(path.build.js)) // 2. Несём в path.build.js ВТОРОЙ раз
     .pipe(browsersync.stream()) // 3. Запускаем параллельно browsersync.stream()
 };
 
@@ -270,9 +256,14 @@ let buildDev = gulp.series( clean, gulp.parallel(fontsBuild, html, css, js, imag
 let watch = gulp.series( buildDev, gulp.parallel(watchFiles, browserSync) ); // ф-ция watch запустит функции
 
 // В случае Экспорта запустится watch, к-рый запустит параллельно функции, к-рые всё сделает.
-exports.fonts = fontsBuild;
-exports.watch = watch;
-exports.default = watch;
+// exports.fonts = fontsBuild;
+// exports.watch = watch;
+// exports.default = watch;
+
+export { fontsBuild }
+export { watch }
+
+gulp.task('default', watch);
 
 // Настройка FTP соединения
 // export const configFTP = {

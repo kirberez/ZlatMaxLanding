@@ -1,10 +1,162 @@
+// import * as flsFunctions from './functions'
+// let flsFunctions = require('./functions')
+
+
+//  Динамический адаптив =======================================================================================================================================================================================================================
+// ( РАЗОБРАТЬСЯ С require/import )
+
+// import { DynamicAdapt } from "./libs/dynamic_adapt.js";
+// const da = new DynamicAdapt("max");
+// da.init();
+// import "./libs/dynamic_adapt.js";
+// const { add } = require("./math"); // named import
+// const subtract = require("./subtract"); // default import
+
+function DynamicAdapt(type) {
+	this.type = type;
+}
+DynamicAdapt.prototype.init = function () {
+	const _this = this;
+	// массив объектов
+	this.оbjects = [];
+	this.daClassname = "_dynamic_adapt_";
+	// массив DOM-элементов
+	this.nodes = document.querySelectorAll("[data-da]");
+	// наполнение оbjects объктами
+	for (let i = 0; i < this.nodes.length; i++) {
+		const node = this.nodes[i];
+		const data = node.dataset.da.trim();
+		const dataArray = data.split(",");
+		const оbject = {};
+		оbject.element = node;
+		оbject.parent = node.parentNode;
+		оbject.destination = document.querySelector(dataArray[0].trim());
+		оbject.breakpoint = dataArray[1] ? dataArray[1].trim() : "767";
+		оbject.place = dataArray[2] ? dataArray[2].trim() : "last";
+		оbject.index = this.indexInParent(оbject.parent, оbject.element);
+		this.оbjects.push(оbject);
+	}
+	this.arraySort(this.оbjects);
+	// массив уникальных медиа-запросов
+	this.mediaQueries = Array.prototype.map.call(this.оbjects, function (item) {
+		return '(' + this.type + "-width: " + item.breakpoint + "px)," + item.breakpoint;
+	}, this);
+	this.mediaQueries = Array.prototype.filter.call(this.mediaQueries, function (item, index, self) {
+		return Array.prototype.indexOf.call(self, item) === index;
+	});
+	// навешивание слушателя на медиа-запрос
+	// и вызов обработчика при первом запуске
+	for (let i = 0; i < this.mediaQueries.length; i++) {
+		const media = this.mediaQueries[i];
+		const mediaSplit = String.prototype.split.call(media, ',');
+		const matchMedia = window.matchMedia(mediaSplit[0]);
+		const mediaBreakpoint = mediaSplit[1];
+		// массив объектов с подходящим брейкпоинтом
+		const оbjectsFilter = Array.prototype.filter.call(this.оbjects, function (item) {
+			return item.breakpoint === mediaBreakpoint;
+		});
+		matchMedia.addListener(function () {
+			_this.mediaHandler(matchMedia, оbjectsFilter);
+		});
+		this.mediaHandler(matchMedia, оbjectsFilter);
+	}
+};
+DynamicAdapt.prototype.mediaHandler = function (matchMedia, оbjects) {
+	if (matchMedia.matches) {
+		for (let i = 0; i < оbjects.length; i++) {
+			const оbject = оbjects[i];
+			оbject.index = this.indexInParent(оbject.parent, оbject.element);
+			this.moveTo(оbject.place, оbject.element, оbject.destination);
+		}
+	} else {
+		//for (let i = 0; i < оbjects.length; i++) {
+		for (let i = оbjects.length - 1; i >= 0; i--) {
+			const оbject = оbjects[i];
+			if (оbject.element.classList.contains(this.daClassname)) {
+				this.moveBack(оbject.parent, оbject.element, оbject.index);
+			}
+		}
+	}
+};
+// Функция перемещения
+DynamicAdapt.prototype.moveTo = function (place, element, destination) {
+	element.classList.add(this.daClassname);
+	if (place === 'last' || place >= destination.children.length) {
+		destination.insertAdjacentElement('beforeend', element);
+		return;
+	}
+	if (place === 'first') {
+		destination.insertAdjacentElement('afterbegin', element);
+		return;
+	}
+	destination.children[place].insertAdjacentElement('beforebegin', element);
+}
+// Функция возврата
+DynamicAdapt.prototype.moveBack = function (parent, element, index) {
+	element.classList.remove(this.daClassname);
+	if (parent.children[index] !== undefined) {
+		parent.children[index].insertAdjacentElement('beforebegin', element);
+	} else {
+		parent.insertAdjacentElement('beforeend', element);
+	}
+}
+// Функция получения индекса внутри родителя
+DynamicAdapt.prototype.indexInParent = function (parent, element) {
+	const array = Array.prototype.slice.call(parent.children);
+	return Array.prototype.indexOf.call(array, element);
+};
+// Функция сортировки массива по breakpoint и place 
+// по возрастанию для this.type = min
+// по убыванию для this.type = max
+DynamicAdapt.prototype.arraySort = function (arr) {
+	if (this.type === "min") {
+		Array.prototype.sort.call(arr, function (a, b) {
+			if (a.breakpoint === b.breakpoint) {
+				if (a.place === b.place) {
+					return 0;
+				}
+				if (a.place === "first" || b.place === "last") {
+					return -1;
+				}
+				if (a.place === "last" || b.place === "first") {
+					return 1;
+				}
+				return a.place - b.place;
+			}
+			return a.breakpoint - b.breakpoint;
+		});
+	} else {
+		Array.prototype.sort.call(arr, function (a, b) {
+			if (a.breakpoint === b.breakpoint) {
+				if (a.place === b.place) {
+					return 0;
+				}
+				if (a.place === "first" || b.place === "last") {
+					return 1;
+				}
+				if (a.place === "last" || b.place === "first") {
+					return -1;
+				}
+				return b.place - a.place;
+			}
+			return b.breakpoint - a.breakpoint;
+		});
+		return;
+	}
+};
+const da = new DynamicAdapt("max");
+da.init();
+
+//  Динамический адаптив =======================================================================================================================================================================================================================
+
 /*
 Попапы
 Документация: https://template.fls.guru/template-docs/funkcional-popup.html
 Сниппет (HTML): pl
 */
-import './libs/popup.js'
-
+// flsFunctions.initPopups(false); // Подклбчение Popup
+console.log('script is active')
+// console.log(flsFunctions.initPopups(false))
 // JS-функция определения поддержки WebP
 function testWebP(callback) {
 	var webP = new Image();
@@ -185,6 +337,13 @@ function menuInit() {
 			if (bodyLockStatus && e.target.closest('.icon-menu')) {
 				bodyLockToggle();
 				document.documentElement.classList.toggle("menu-open");
+        if (document.documentElement.classList.contains('catalog-open')) {
+          document.documentElement.classList.remove('catalog-open');
+        }
+        if (document.documentElement.classList.contains('sub-menu-open')) {
+          document.documentElement.classList.remove('sub-menu-open');
+        }
+        
 			}
 		});
 	};
@@ -320,3 +479,59 @@ let bodyLock = (delay = 500) => {
 
 spollers();
 menuInit();
+
+
+
+document.addEventListener('click', documentActions);
+
+const menuBlocks = document.querySelectorAll('.sub-menu-catalog__block'); // Все объекты блоков
+if (menuBlocks.length) {
+  menuBlocks.forEach(menuBlock => { // menuBlock - конкретная кнопка (ссылка) из пункта меню блока
+    const menuBlockItems = menuBlock.querySelectorAll('.sub-menu-catalog__category').length; // Кол-во пунктов (ссылок) в блоке
+    menuBlock.classList.add(`sub-menu-catalog__block_${menuBlockItems}`) // Класс - кол-во категорий в блоке
+  })
+}
+
+function documentActions(e) {
+  const targetElement = e.target; // Нажатый элемент
+  if (targetElement.closest('[data-parent]')) {   
+    const subMenuId = targetElement.dataset.parent ? targetElement.dataset.parent : null; // ИД нажатого эл-та
+    const subMenu = document.querySelector(`[data-submenu="${subMenuId}"]`); // Блок меню, с-щий нажатому эл-ту
+    if (subMenu) {
+      const activeLink = document.querySelector('._sub-menu-active');
+      const activeBlock = document.querySelector('._sub-menu-open');
+
+      if (activeLink && activeLink !== targetElement) {
+        activeLink.classList.remove('_sub-menu-active');
+        activeBlock.classList.remove('_sub-menu-open');
+        document.documentElement.classList.remove('sub-menu-open');
+      };
+      document.documentElement.classList.toggle('sub-menu-open');
+      targetElement.classList.toggle('_sub-menu-active');
+      subMenu.classList.toggle('_sub-menu-open');
+    };
+    e.preventDefault();
+  }
+
+  if (targetElement.closest('.menu-top-header__link_catalog')) {
+    document.documentElement.classList.add('catalog-open');
+    e.preventDefault();
+  }
+
+  if (targetElement.closest('.menu-catalog__back')) {
+    document.documentElement.classList.remove('catalog-open');
+
+    document.querySelector('._sub-menu-active') ? document.querySelector('._sub-menu-active').classList.remove('_sub-menu-active') : null;
+    document.querySelector('._sub-menu-open') ? document.querySelector('._sub-menu-open').classList.remove('_sub-menu-open') : null;
+
+    e.preventDefault();
+  }
+
+  if (targetElement.closest('.sub-menu-catalog__back')) {
+    document.documentElement.classList.remove('sub-menu-open');
+    document.querySelector('._sub-menu-active') ? document.querySelector('._sub-menu-active').classList.remove('_sub-menu-active') : null;
+    document.querySelector('._sub-menu-open') ? document.querySelector('._sub-menu-open').classList.remove('_sub-menu-open') : null;
+
+    e.preventDefault();
+  }
+}
