@@ -141,8 +141,23 @@ body {
     padding: 0 $containerPadding + px;
   }
 }
-
-
+// Стили для отзывчивых картинок (IBG)
+[class*="-ibg"] {
+	position: relative;
+	img {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+		object-fit: cover;
+	}
+}
+[class*="-ibg_contain"] {
+	img {
+		object-fit: contain;
+	}
+}
 
 
 
@@ -152,9 +167,11 @@ body {
 @import "fonts/icons"; // Подключить если есть файл иконочного шрифта
 
 @import "popup";
-
-
+@import "common"; // повторяющийся код
 
 @import "header";
+@import "main";
 
 
+// Рейтинг
+@import "rating";

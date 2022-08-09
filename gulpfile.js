@@ -2,7 +2,7 @@ import { createRequire } from "module"; // to use import/export and require in s
 const require = createRequire(import.meta.url);
 
 // В эту папку будет собираться проект, Эта папка (С названием проекта) передаётся на сервер заказчику 
-let project_folder = './zlatmaxGulp'
+let project_folder = 'zlatmaxGulp'
 console.log(project_folder)
 // Имя папки с иходниками
 let source_folder="./src";
@@ -25,8 +25,8 @@ const path={
     css: source_folder + "/scss/style.scss",
     scss: source_folder + "/scss/style.scss", // ***
     js: source_folder + "/js/script.js", // *** app.js -> script.js 
-    img: source_folder + "/img/**/*.{jpg,jpeg,png,gif,webp}",
-    svg: source_folder + "/img/**/*.svg",
+    img: source_folder + "/img/**/*.{jpg,jpeg,png,svg,gif,webp}",
+    svg: source_folder + "/img/**/*.svg", // Бесполезно
     fonts: source_folder + "/fonts/*.*",
     files: source_folder + "/files/**/*.*", // ***
 		svgicons: source_folder + "/svgicons/*.svg", // ***
@@ -47,27 +47,47 @@ const path={
 
 // **************************
 // Создаём переменные
+import gulp from "gulp";
+// import browsersync from "browser-sync";
+import fileinclude from "gulp-file-include";
+import del from "del";
+// import scss from "gulp-sass";
+import autoprefixer from "gulp-autoprefixer";
+import group_media from "gulp-group-css-media-queries";
+import clean_css from "gulp-clean-css";
+import rename from "gulp-rename";
+// import uglify from "gulp-uglify-es";
+import babel from "gulp-babel";
+import imagemin from "gulp-imagemin";
+import webphtml from "gulp-webp-html";
+import webp from "imagemin-webp";
+import webpcss from "gulp-webpcss";
+import svgSprite from "gulp-svg-sprite";
+import ttf2woff from "gulp-ttf2woff";
+import ttf2woff2 from "gulp-ttf2woff2";
+import fonter from "gulp-fonter";
+import newer from "gulp-newer";
 let { src, dest } = require('gulp'),
-  gulp = require('gulp'),
+  // gulp = require('gulp'),
   browsersync = require('browser-sync').create(), // Плагин который обновляет страницы
-  fileinclude = require('gulp-file-include'), // Плагин, который объекдиняет файлы в один общий
-  del = require('del'), // Плагин, который будет очищать папку dist
+  // fileinclude = require('gulp-file-include'), // Плагин, который объекдиняет файлы в один общий
+  // del = require('del'), // Плагин, который будет очищать папку dist
   scss = require('gulp-sass')(require('sass')), // 
-  autoprefixer = require('gulp-autoprefixer'),
-  group_media = require("gulp-group-css-media-queries"),  // Собирает по всему документу медиа-запросы
-  clean_css = require('gulp-clean-css'), // 
-  rename = require('gulp-rename'), //
-  uglify = require('gulp-uglify-es').default, // Сжимает js
-  babel = require('gulp-babel'), // ** add Совмещает с более старыии версиями
-  imagemin = require('gulp-imagemin'), // Оптимизирует картинки
-  webphtml = require('gulp-webp-html'), // Конвертирует картинки в HTML
-  webp = require('imagemin-webp'), // Конвертирует картинки в формат Webp
-  webpcss = require('gulp-webpcss'),  // Конвертирует картинки в CSS
-  svgSprite = require('gulp-svg-sprite'), // Оборачивает картинки SVG
-  ttf2woff = require('gulp-ttf2woff'),
-  ttf2woff2 = require('gulp-ttf2woff2'),
-  fonter = require('gulp-fonter'),
-  newer = require('gulp-newer');
+  // autoprefixer = require('gulp-autoprefixer'),
+  // group_media = require("gulp-group-css-media-queries"),  // Собирает по всему документу медиа-запросы
+  // clean_css = require('gulp-clean-css'), // 
+  // rename = require('gulp-rename'), //
+  uglify = require('gulp-uglify-es').default; // Сжимает js
+  // babel = require('gulp-babel'), // ** add Совмещает с более старыии версиями
+  // imagemin = require('gulp-imagemin'), // Оптимизирует картинки
+  // webphtml = require('gulp-webp-html'), // Конвертирует картинки в HTML
+  // webp = require('imagemin-webp'), // Конвертирует картинки в формат Webp
+  // webpcss = require('gulp-webpcss'),  // Конвертирует картинки в CSS
+  // svgSprite = require('gulp-svg-sprite'), // Оборачивает картинки SVG
+  // ttf2woff = require('gulp-ttf2woff'),
+  // ttf2woff2 = require('gulp-ttf2woff2'),
+  // fonter = require('gulp-fonter'),
+  // newer = require('gulp-newer');
   // webpack = require('webpack-stream'); // Webpack gulp
 
 
@@ -112,8 +132,8 @@ function css() {
     )
     .pipe(
       webpcss({
-        webpClass: '.webp', 
-        noWebpClass: '.no-webp'
+        // webpClass: '.webp', 
+        // noWebpClass: '.no-webp'
       })
     )
     .pipe(dest(path.build.css)) // 2. Несём в path.build.css
