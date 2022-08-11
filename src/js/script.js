@@ -326,6 +326,12 @@ function dataMediaQueries(array, dataSetValue) {
 			return item.dataset[dataSetValue].split(",")[0];
 		}
 	});
+  // Уникализация массива
+  function uniqArray(array) {
+    return array.filter(function (item, index, self) {
+      return self.indexOf(item) === index;
+    });
+  }
 	// Инициализация объектов с медиа запросами
 	if (media.length) {
 		const breakpointsArray = [];
