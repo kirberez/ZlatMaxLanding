@@ -225,7 +225,7 @@ export function formSubmit(validate) {
 					}
 					formValidate.formClean(form);
 				} else {
-					alert("Ошибка");
+					console.log("Ошибка");
 					form.classList.remove('_sending');
 				}
 			}
@@ -248,19 +248,7 @@ export function formSubmit(validate) {
 		}
 	}
 }
-/* Маски для полей (в работе) ЧФ - libs/inputmask.js */ 
-// export function formMasks(logging) {
-// 	formsModules.inputMaskModule = new InputMask({
-// 		logging: logging
-// 	});
-// }
-/* Модуль работы с select */
-// Можно обойтись. Если нет, то ЧФ - libs/select.js
-// export function formSelect(logging) {
-// 	formsModules.selectModule = new SelectConstructor({
-// 		logging: logging
-// 	});
-// }
+
 /* Модуь формы "показать пароль" */
 export function formViewpass() {
 	document.addEventListener("click", function (e) {
@@ -272,7 +260,7 @@ export function formViewpass() {
 		}
 	});
 }
-/* Модуь формы "колличество" */
+/* Модуь формы "количество" */
 export function formQuantity() {
 	document.addEventListener("click", function (e) {
 		let targetElement = e.target;

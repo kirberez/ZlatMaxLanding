@@ -186,16 +186,12 @@ DynamicAdapt.prototype.arraySort = function (arr) {
 };
 const da = new DynamicAdapt("max");
 da.init();
-
 //  Динамический адаптив =======================================================================================================================================================================================================================
-
 /*
 Попапы
 Документация: https://template.fls.guru/template-docs/funkcional-popup.html
-Сниппет (HTML): pl
 */
-// flsFunctions.initPopups(false); // Подклбчение Popup
-console.log('script is active')
+// flsFunctions.initPopups(false); // Подкл.чение Popup
 // console.log(flsFunctions.initPopups(false))
 // JS-функция определения поддержки WebP
 function testWebP(callback) {
@@ -526,6 +522,203 @@ let bodyLock = (delay = 500) => {
 // Модуль работы с табами ====================================================================================================================================================================================================================================================================================
 // flsFunctions.tabs(); // require is not defined ???
 
+
+// // Работа с формами ========================================================================================================================================================================================================================================================
+// // require is not defined ???
+// import * as flsForms from "./forms/forms.js";
+// /* Модуль работы с select. Для включения ??? (подсказок в консоли) передать true */
+// // flsForms.formSelect(false);
+// // flsForms.formRating();
+
+// /* Работа с полями формы: добавление классов, работа с placeholder. */
+// flsForms.formFieldsInit();
+
+// /* Oтправка формы со встроенной валидацией полей. false - отключит валидацию */
+// flsForms.formSubmit(true);
+
+// 
+// Работа с полями формы. Добавление классов, работа с placeholder
+function formFieldsInit() {
+	const formFields = document.querySelectorAll('input[placeholder],textarea[placeholder]');
+	if (formFields.length) {
+		formFields.forEach(formField => {
+			formField.dataset.placeholder = formField.placeholder;
+		});
+	}
+	document.body.addEventListener("focusin", function (e) {
+		const targetElement = e.target;
+		if ((targetElement.tagName === 'INPUT' || targetElement.tagName === 'TEXTAREA')) {
+			if (targetElement.dataset.placeholder) {
+				targetElement.placeholder = '';
+			}
+			targetElement.classList.add('_form-focus');
+			targetElement.parentElement.classList.add('_form-focus');
+
+			formValidate.removeError(targetElement);
+		}
+	});
+	document.body.addEventListener("focusout", function (e) {
+		const targetElement = e.target;
+		if ((targetElement.tagName === 'INPUT' || targetElement.tagName === 'TEXTAREA')) {
+			if (targetElement.dataset.placeholder) {
+				targetElement.placeholder = targetElement.dataset.placeholder;
+			}
+			targetElement.classList.remove('_form-focus');
+			targetElement.parentElement.classList.remove('_form-focus');
+
+			// Моментальная валидация
+			if (targetElement.hasAttribute('data-validate')) {
+				formValidate.validateInput(targetElement);
+			}
+		}
+	});
+}
+/* Отправка форм */
+function formSubmit(validate) {
+	const forms = document.forms;
+	if (forms.length) {
+		for (const form of forms) {
+			form.addEventListener('submit', function (e) {
+				const form = e.target;
+				formSubmitAction(form, e);
+			});
+			form.addEventListener('reset', function (e) {
+				const form = e.target;
+				formValidate.formClean(form);
+			});
+		}
+	}
+	async function formSubmitAction(form, e) {
+		const error = validate ? formValidate.getErrors(form) : 0;
+		if (error === 0) {
+			const popup = form.dataset.popup;
+			const ajax = form.hasAttribute('data-ajax');
+			//SendForm
+			if (ajax) {
+				e.preventDefault();
+				const formAction = form.getAttribute('action') ? form.getAttribute('action').trim() : '#';
+				const formMethod = form.getAttribute('method') ? form.getAttribute('method').trim() : 'GET';
+				const formData = new FormData(form);
+
+				form.classList.add('_sending');
+				const response = await fetch(formAction, {
+					method: formMethod,
+					body: formData
+				});
+				if (response.ok) {
+					let responseResult = await response.json();
+					form.classList.remove('_sending');
+					if (popup) {
+						// Нужно подключить зависимость
+						popupItem.open(`#${popup}`);
+					}
+					formValidate.formClean(form);
+				} else {
+					console.log("Ошибка");
+					form.classList.remove('_sending');
+				}
+			}
+			// Если режим разработки
+			if (form.hasAttribute('data-dev')) {
+				e.preventDefault();
+				if (popup) {
+					// Нужно подключить зависимость
+					popupItem.open(`#${popup}`);
+				}
+				formValidate.formClean(form);
+			}
+		} else {
+			e.preventDefault();
+			const formError = form.querySelector('._form-error');
+			if (formError && form.hasAttribute('data-goto-error')) {
+				gotoBlock(formError, true, 1000);
+			}
+
+		}
+	}
+}
+// Валидация форм
+let formValidate = {
+	getErrors(form) {
+		let error = 0;
+		let formRequiredItems = form.querySelectorAll('*[data-required]');
+		if (formRequiredItems.length) {
+			formRequiredItems.forEach(formRequiredItem => {
+				if ((formRequiredItem.offsetParent !== null || formRequiredItem.tagName === "SELECT") && !formRequiredItem.disabled) {
+					error += this.validateInput(formRequiredItem);
+				}
+			});
+		}
+		return error;
+	},
+	validateInput(formRequiredItem) {
+		let error = 0;
+		if (formRequiredItem.dataset.required === "email") {
+			formRequiredItem.value = formRequiredItem.value.replace(" ", "");
+			if (this.emailTest(formRequiredItem)) {
+				this.addError(formRequiredItem);
+				error++;
+			} else {
+				this.removeError(formRequiredItem);
+			}
+		} else if (formRequiredItem.type === "checkbox" && !formRequiredItem.checked) {
+			this.addError(formRequiredItem);
+			error++;
+		} else {
+			if (!formRequiredItem.value) {
+				this.addError(formRequiredItem);
+				error++;
+			} else {
+				this.removeError(formRequiredItem);
+			}
+		}
+		return error;
+	},
+	addError(formRequiredItem) {
+		formRequiredItem.classList.add('_form-error');
+		formRequiredItem.parentElement.classList.add('_form-error');
+		let inputError = formRequiredItem.parentElement.querySelector('.form__error');
+		if (inputError) formRequiredItem.parentElement.removeChild(inputError);
+		if (formRequiredItem.dataset.error) {
+			formRequiredItem.parentElement.insertAdjacentHTML('beforeend', `<div class="form__error">${formRequiredItem.dataset.error}</div>`);
+		}
+	},
+	removeError(formRequiredItem) {
+		formRequiredItem.classList.remove('_form-error');
+		formRequiredItem.parentElement.classList.remove('_form-error');
+		if (formRequiredItem.parentElement.querySelector('.form__error')) {
+			formRequiredItem.parentElement.removeChild(formRequiredItem.parentElement.querySelector('.form__error'));
+		}
+	},
+	formClean(form) {
+		form.reset();
+		setTimeout(() => {
+			let inputs = form.querySelectorAll('input,textarea');
+			for (let index = 0; index < inputs.length; index++) {
+				const el = inputs[index];
+				el.parentElement.classList.remove('_form-focus');
+				el.classList.remove('_form-focus');
+				formValidate.removeError(el);
+				el.value = el.dataset.placeholder;
+			}
+			let checkboxes = form.querySelectorAll('.checkbox__input');
+			if (checkboxes.length > 0) {
+				for (let index = 0; index < checkboxes.length; index++) {
+					const checkbox = checkboxes[index];
+					checkbox.checked = false;
+				}
+			}
+		}, 0);
+	},
+	emailTest(formRequiredItem) {
+		return !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,8})+$/.test(formRequiredItem.value);
+	}
+}
+/* Работа с полями формы: добавление классов, работа с placeholder. */
+formFieldsInit();
+/* Oтправка формы со встроенной валидацией полей. false - отключит валидацию */
+formSubmit(true);
+
 //  Модуль звездного рейтинга ====================================================================================================================================================================================================================================================================================
 function formRating() {
 	const ratings = document.querySelectorAll('.rating');
@@ -629,21 +822,203 @@ function formRating() {
 	}
 }
 
+// Модуь работы с табами =======================================================================================================================================================================================================================
+/*
+Для родителя табов пишем атрибут data-tabs
+Для родителя заголовков табов пишем атрибут data-tabs-titles
+Для родителя блоков табов пишем атрибут data-tabs-body
+
+Если нужно чтобы табы открывались с анимацией 
+добавляем к data-tabs data-tabs-animate
+По умолчанию, скорость анимации 500ms, 
+указать свою скорость можно так: data-tabs-animate="1000"
+
+Если нужно чтобы табы превращались в "спойлеры" на неком размере экранов пишем параметры ширины.
+Например: data-tabs="992" - табы будут превращаться в спойлеры на экранах меньше или равно 992px
+*/
+function tabs() {
+	const tabs = document.querySelectorAll('[data-tabs]');
+	let tabsActiveHash = [];
+
+	if (tabs.length > 0) {
+		const hash = location.hash.replace('#', '');
+		if (hash.startsWith('tab-')) {
+			tabsActiveHash = hash.replace('tab-', '').split('-');
+		}
+		tabs.forEach((tabsBlock, index) => {
+			tabsBlock.classList.add('_tab-init');
+			tabsBlock.setAttribute('data-tabs-index', index);
+			tabsBlock.addEventListener("click", setTabsAction);
+			initTabs(tabsBlock);
+		});
+
+		// Получение табов с медиа запросами
+		const tabsMedia = Array.from(tabs).filter(function (item, index, self) {
+			return item.dataset.tabs;
+		});
+		// Инициализация табов с медиа запросами
+		if (tabsMedia.length > 0) {
+			initMediaTabs(tabsMedia);
+		}
+	}
+	// Инициализация табов с медиа запросами
+	function initMediaTabs(tabsMedia) {
+		const breakpointsArray = [];
+		tabsMedia.forEach(item => {
+			const breakpointValue = item.dataset.tabs;
+
+			const tabsBreakpointsObject = {};
+			tabsBreakpointsObject.value = breakpointValue;
+			tabsBreakpointsObject.item = item;
+
+			breakpointsArray.push(tabsBreakpointsObject);
+		});
+
+		// Получаем уникальные брейкпоинты
+		let mediaQueries = breakpointsArray.map(function (item) {
+			return `(max-width:${item.value}px),${item.value}`;
+		});
+		mediaQueries = mediaQueries.filter(function (item, index, self) {
+			return self.indexOf(item) === index;
+		});
+
+		// Работаем с каждым брейкпоинтом
+		mediaQueries.forEach(breakpoint => {
+			const paramsArray = breakpoint.split(",");
+			const matchMedia = window.matchMedia(paramsArray[0]);
+			const mediaBreakpoint = paramsArray[1];
+
+			// Объекты с нужными условиями
+			const tabsMediaArray = breakpointsArray.filter(function (item) {
+				if (item.value === mediaBreakpoint) {
+					return true;
+				}
+			});
+
+			// Событие
+			matchMedia.addEventListener("change", function () {
+				setTitlePosition(tabsMediaArray, matchMedia);
+			});
+			setTitlePosition(tabsMediaArray, matchMedia);
+		});
+	}
+	// Установка позиций заголовков
+	function setTitlePosition(tabsMediaArray, matchMedia) {
+		tabsMediaArray.forEach(tabsMediaItem => {
+			tabsMediaItem = tabsMediaItem.item;
+			const tabsTitles = tabsMediaItem.querySelector('[data-tabs-titles]');
+			const tabsTitleItems = tabsMediaItem.querySelectorAll('[data-tabs-title]');
+			const tabsContent = tabsMediaItem.querySelector('[data-tabs-body]');
+			const tabsContentItems = tabsMediaItem.querySelectorAll('[data-tabs-item]');
+			tabsContentItems.forEach((tabsContentItem, index) => {
+				if (matchMedia.matches) {
+					tabsContent.append(tabsTitleItems[index]);
+					tabsContent.append(tabsContentItem);
+					tabsMediaItem.classList.add('_tab-spoller');
+				} else {
+					tabsTitles.append(tabsTitleItems[index]);
+					tabsMediaItem.classList.remove('_tab-spoller');
+				}
+			});
+		});
+	}
+	// Работа с контентом
+	function initTabs(tabsBlock) {
+		const tabsTitles = tabsBlock.querySelectorAll('[data-tabs-titles]>*');
+		const tabsContent = tabsBlock.querySelectorAll('[data-tabs-body]>*');
+		const tabsBlockIndex = tabsBlock.dataset.tabsIndex;
+		const tabsActiveHashBlock = tabsActiveHash[0] == tabsBlockIndex;
+
+		if (tabsActiveHashBlock) {
+			const tabsActiveTitle = tabsBlock.querySelector('[data-tabs-titles]>._tab-active');
+			tabsActiveTitle.classList.remove('_tab-active');
+		}
+		if (tabsContent.length > 0) {
+			tabsContent.forEach((tabsContentItem, index) => {
+				tabsTitles[index].setAttribute('data-tabs-title', '');
+				tabsContentItem.setAttribute('data-tabs-item', '');
+
+				if (tabsActiveHashBlock && index == tabsActiveHash[1]) {
+					tabsTitles[index].classList.add('_tab-active');
+				}
+				tabsContentItem.hidden = !tabsTitles[index].classList.contains('_tab-active');
+			});
+		}
+	}
+	function setTabsStatus(tabsBlock) {
+		const tabsTitles = tabsBlock.querySelectorAll('[data-tabs-title]');
+		const tabsContent = tabsBlock.querySelectorAll('[data-tabs-item]');
+		const tabsBlockIndex = tabsBlock.dataset.tabsIndex;
+
+		function isTabsAnamate(tabsBlock) {
+			if (tabsBlock.hasAttribute('data-tabs-animate')) {
+				return tabsBlock.dataset.tabsAnimate > 0 ? tabsBlock.dataset.tabsAnimate : 500;
+			}
+		}
+		const tabsBlockAnimate = isTabsAnamate(tabsBlock);
+
+		if (tabsContent.length > 0) {
+			tabsContent.forEach((tabsContentItem, index) => {
+				if (tabsTitles[index].classList.contains('_tab-active')) {
+					if (tabsBlockAnimate) {
+						_slideDown(tabsContentItem, tabsBlockAnimate);
+					} else {
+						tabsContentItem.hidden = false;
+					}
+					location.hash = `tab-${tabsBlockIndex}-${index}`;
+				} else {
+					if (tabsBlockAnimate) {
+						_slideUp(tabsContentItem, tabsBlockAnimate);
+					} else {
+						tabsContentItem.hidden = true;
+					}
+				}
+			});
+		}
+	}
+	function setTabsAction(e) {
+		const el = e.target;
+		if (el.closest('[data-tabs-title]')) {
+			const tabTitle = el.closest('[data-tabs-title]');
+			const tabsBlock = tabTitle.closest('[data-tabs]');
+			if (!tabTitle.classList.contains('_tab-active') && !tabsBlock.querySelectorAll('._slide').length) {
+
+				const tabActiveTitle = tabsBlock.querySelector('[data-tabs-title]._tab-active');
+				if (tabActiveTitle) {
+					tabActiveTitle.classList.remove('_tab-active');
+				}
+
+				tabTitle.classList.add('_tab-active');
+				setTabsStatus(tabsBlock);
+			}
+			e.preventDefault();
+		}
+	}
+}
+
+/* Модуль формы "количество" */
+function formQuantity() {
+	document.addEventListener("click", function (e) {
+		let targetElement = e.target;
+		if (targetElement.closest('.quantity__button')) {
+			let value = parseInt(targetElement.closest('.quantity').querySelector('input').value);
+			if (targetElement.classList.contains('quantity__button_plus')) {
+				value++;
+			} else {
+				--value;
+				if (value < 1) value = 1;
+			}
+			targetElement.closest('.quantity').querySelector('input').value = value;
+		}
+	});
+}
+
 formRating();
+formQuantity();
 spollers();
 menuInit();
+tabs();
 
-
-
-document.addEventListener('click', documentActions);
-
-const menuBlocks = document.querySelectorAll('.sub-menu-catalog__block'); // Все объекты блоков
-if (menuBlocks.length) {
-  menuBlocks.forEach(menuBlock => { // menuBlock - конкретная кнопка (ссылка) из пункта меню блока
-    const menuBlockItems = menuBlock.querySelectorAll('.sub-menu-catalog__category').length; // Кол-во пунктов (ссылок) в блоке
-    menuBlock.classList.add(`sub-menu-catalog__block_${menuBlockItems}`) // Класс - кол-во категорий в блоке
-  })
-}
 
 function documentActions(e) {
   const targetElement = e.target; // Нажатый элемент
@@ -688,3 +1063,32 @@ function documentActions(e) {
     e.preventDefault();
   }
 }
+
+document.addEventListener('click', documentActions);
+
+const menuBlocks = document.querySelectorAll('.sub-menu-catalog__block'); // Все объекты блоков
+if (menuBlocks.length) {
+  menuBlocks.forEach(menuBlock => { // menuBlock - конкретная кнопка (ссылка) из пункта меню блока
+    const menuBlockItems = menuBlock.querySelectorAll('.sub-menu-catalog__category').length; // Кол-во пунктов (ссылок) в блоке
+    menuBlock.classList.add(`sub-menu-catalog__block_${menuBlockItems}`) // Класс - кол-во категорий в блоке
+  })
+}
+
+if (document.querySelector('.filter-catalog__title')) {
+  document.querySelector('.filter-catalog__title').addEventListener('click', function(elem) {
+    if (window.innerWidth < 992) {
+      document.querySelector('.filter-catalog__items').classList.toggle('_active');
+    }
+  })
+}
+
+
+
+
+// // Модуль работы с ползунком  ===================================================================================================================================================================================================================================================================================
+// /*
+// Подключение и настройка выполняется в файле js/files/forms/range.js
+// Документация плагина: https://refreshless.com/nouislider/
+// */
+// import "./files/forms/range.js";
+// 

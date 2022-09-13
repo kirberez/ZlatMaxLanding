@@ -102,6 +102,11 @@
     line-height: math.div(27, 18);
     a {
       color: #E8AA31;
+      @media (any-hover: hover) {
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
   }
 }
@@ -134,6 +139,11 @@
       font-size: rem(20);
       margin: em(5, 15) em(10, 15) 0 0;
 		}
+    &._icon-footer-mail {
+      &::before {
+        font-size: rem(13);
+      }
+    }
   }
 }
 .social-footer {
@@ -151,14 +161,22 @@
     color: #FFFFFF;
     line-height: math.div(22, 18);
     &:not(:last-child) {
-      margin-bottom: em(10, 18);
-		}
+      margin-bottom: em(15, 18);
+    }
   }
   // footer-subscribe__line
   &__line {
     display: flex;
-    border-radius: 3px;
-    overflow: hidden;
+    position: relative;
+    .form__error {
+      position: absolute;
+      bottom: -15px;
+      color: red;
+      font-size: rem(10);
+    }
+    &:not(:last-child) {
+      margin-bottom: em(15, 18);
+    }
   }
   // .footer-subscribe__input
   &__input {
@@ -168,7 +186,9 @@
     color: #FFFFFF;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid #FFFFFF;
+    border-radius: rem(3) 0 0 rem(3);
     border-right: none;
+    outline: none;
   }
   // .footer-subscribe__button
   &__button {
@@ -178,6 +198,7 @@
     justify-content: center;
     align-items: center;
     background-color: #E8AA31;
+    border-radius: 0 rem(3) rem(3) 0;
     &::before {
       color: #FFFFFF;
       font-size: rem(8);
@@ -185,6 +206,44 @@
     }
   }
 }
-
-
-
+.accept-footer {
+  position: relative;
+  padding-left: rem(40);
+  display: block;
+  cursor: pointer;
+  color: #FFFFFF;
+  font-size: rem(16);
+  line-height: math.div(22, 16);
+  // accept-footer__checkmark
+  &__checkmark {
+    position: absolute;
+    top: rem(4);
+    left: 0;
+    width: rem(20);
+    height: rem(20);
+    border: 1px solid #FFFFFF;
+    border-radius: 2px;
+    background-color: transparent;
+    &::after {
+      content: "";
+      position: absolute;
+      top: rem(3);
+      left: rem(6);
+      display: inline-block;
+      height: rem(10);
+      width: rem(5);
+    }
+  }
+  // .accept-footer__input
+  &__input {
+    position: absolute;
+    opacity: 0;
+    z-index: -1;
+    transition: all .3s ease-in-out;
+    &:checked ~ .accept-footer__checkmark::after {
+      transform: rotate(45deg);
+      border-bottom: 3px solid #78b13f;
+      border-right: 3px solid #78b13f;
+    }
+  }
+}

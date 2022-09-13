@@ -166,13 +166,47 @@ body {
 // Подключение иконочных шрифтов
 @import "fonts/icons"; // Подключить если есть файл иконочного шрифта
 
-@import "popup";
-@import "common"; // повторяющийся код
 
 @import "header";
 @import "main";
 @import "footer";
+@import "catalog";
+@import "product";
+
+
+@import "select";
+@import "popup";
+@import "quantity";
+@import "common"; // повторяющийся код
 
 
 // Рейтинг
 @import "rating";
+
+
+.breadcrumbs {
+	white-space: nowrap;
+	overflow: auto;
+	height: rem(22);
+	// .breadcrumbs__list
+	&__list {
+		display: flex;
+	}
+	// .breadcrumbs__link
+	&__link {
+		opacity: 0.5;
+		display: flex;
+		align-items: center;
+		&::after {
+			content: "\e900";
+			@extend %ic;
+			transform: rotate(-90deg);
+			font-size: rem(6);
+			margin: 0px em(10, 6);
+		}
+	}
+	// .breadcrumbs__current
+	&__current {
+		color: #E8AA31;
+	}
+}

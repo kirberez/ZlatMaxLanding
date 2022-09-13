@@ -10,6 +10,12 @@
 	</head>
 	<body>
     <div class="wrapper">
+      <h2>Готовые страницы:</h2>
+			<ol class="rootpage__list">
+				<li><a target="_blank" href="home.html">Главная</a></li>
+				<li><a target="_blank" href="catalog.html">Каталог</a></li>
+				<li><a target="_blank" href="product.html">Карточка товара</a></li>
+			</ol>
       <header class="header">
         <div class="header__top top-header">
           <div class="top-header__container">
@@ -343,7 +349,7 @@
             </div>
           </div>
         </section>
-        <!-- <section class="page__catalog-cards catalog-cards">
+        <section class="page__catalog-cards catalog-cards">
           <div class="catalog-cards__container">
             <div class="catalog-cards__item item-catalog-card">
               <div class="item-catalog-card__body">
@@ -1781,7 +1787,7 @@
               <div class="products-slider__dotts dotts"></div>
             </div>
           </div>
-        </section> -->
+        </section>
       </main>
       <footer class="footer">
         <section class="footer__title title-footer">
@@ -1922,23 +1928,23 @@
                       </nav>
                       <ul class="social-footer">
                         <li class="socaial-footer__item"><a href="" class="social-footer__link">
-                          <img src="./img/footer/fb.svg" alt="">
+                          <img src="./img/footer/fb.png" alt="">
                         </a></li>
                         <li class="socaial-footer__item"><a href="" class="social-footer__link">
-                          <img src="./img/footer/viber.svg" alt="">
+                          <img src="./img/footer/viber.png" alt="">
                         </a></li>
                         <li class="socaial-footer__item"><a href="" class="social-footer__link">
-                          <img src="./img/footer/tg.svg" alt="">
+                          <img src="./img/footer/tg.png" alt="">
                         </a></li>
                         <li class="socaial-footer__item"><a href="" class="social-footer__link">
-                          <img src="./img/footer/wa.svg" alt="">
+                          <img src="./img/footer/wa.png" alt="">
                         </a></li>
                       </ul>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="body-footer__block block-footer">
+              <div class="body-footer__block block-footer"> 
                 <div data-spollers="767.98" class="block-footer__spoller spoller-footer">
                   <div class="spoller-footer__item">
                     <button data-spoller type="button" class="spoller-footer__title">ПОЛЕЗНЫЕ ССЫЛКИ</button>
@@ -1973,11 +1979,15 @@
                           Подпишитесь прямо сейчас!
                         </label>
                         <div class="footer-subscribe__line">
-                          <input id="subscribe-input" class="footer-subscribe__input" autocomplete="off" type="text" name="form[]" data-error="Ошибка" data-required="email" placeholder="example@gmail.com">
+                          <input checked id="subscribe-input" class="footer-subscribe__input" autocomplete="off" type="text" name="form[]" data-error="Ошибка" data-required="email" placeholder="example@gmail.com">
                           <button type="submit" class="footer-subscribe__button _icon-arrow-down"></button>
                         </div>
+                        <label for="accept-input" class="footer-subscribe__accept accept-footer">
+                          <input id="accept-input" class="accept-footer__input" type="checkbox" name="form[]">
+                          <span>Я прочитал Условия соглашения и согласен с условиями </span>
+                          <span class="accept-footer__checkmark"></span>
+                        </label>
                       </form>
-
                     </div>
                   </div>
                 </div>
@@ -1994,7 +2004,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div>  
       </footer>
     </div>
     @@include('html/_popup.htm',{})

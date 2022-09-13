@@ -85,24 +85,6 @@
     }
   }
 }
-.button {
-  display: inline-block;
-  padding: 8px 52px;
-  color: #fff;
-  text-align: center;
-  font-weight: 600;
-  font-size: 20px;
-  line-height: 32px;
-  background: #E8AA31;
-  box-shadow: 0px 4px 20px rgba(232, 170, 49, 0.43);
-  border-radius: 3px;
-  transition: box-shadow .3s ease-in-out;
-  @media (any-hover: hover) {
-    &:hover {
-      box-shadow: 0px 4px 25px rgba(232, 170, 49, 0.63);
-    }
-  }
-}
 .controll-main-block {
   display: inline-grid;
   grid-auto-flow: column;
@@ -580,6 +562,7 @@
 	}
 }
 //========================================================================================================================================================
+
 
 
 
