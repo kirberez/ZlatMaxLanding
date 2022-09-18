@@ -165,20 +165,21 @@ body {
 @import "fonts";
 // Подключение иконочных шрифтов
 @import "fonts/icons"; // Подключить если есть файл иконочного шрифта
-
+// Подключить ползунок nouislider
+@import "range";
 
 @import "header";
 @import "main";
 @import "footer";
 @import "catalog";
 @import "product";
-
+@import "common"; // повторяющийся код
 
 @import "select";
 @import "popup";
 @import "quantity";
-@import "common"; // повторяющийся код
-
+@import "tippy";
+@import "swiper";
 
 // Рейтинг
 @import "rating";

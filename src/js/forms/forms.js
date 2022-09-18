@@ -1,39 +1,25 @@
-// 
-import { _slideUp, _slideDown, _slideToggle, menuClose } from "../script.js"
-// import { Popup } from "../libs/popup.js"; // Класс Popup
-
-// Модуль попапов ===========================================================================================================================================================================================================================
-/*
-Документация по работе в шаблоне:
-data-popup - Атрибут для кнопки, которая вызывает попап
-data-close - Атрибут для кнопки, которая закрывает попап
-data-youtube - Атрибут для кода youtube
-Сниппет (HTML): pl
-*/
-// const initPopups = (logging = false, init = true) => new Popup({ logging: logging, init: init });
+// Вспомогательные функции
+import { isMobile, _slideUp, initPopups, _slideDown, _slideToggle } from "../functions.js";
+// Класс select
+import { SelectConstructor } from "../libs/select.js";
 // Функционал попапа
-// const popupItem = initPopups();
-//==============================================================================================================================================================================================================================================================================================================================
-// Объект модулей форм для экспорта - постараться без него
-// export const formsModules = {
-// 	inputMaskModule: null,
-// 	selectModule: null
-// }
-
+const popupItem = initPopups();
 //================================================================================================================================================================================================================================================================================================================================
 /*
 Чтобы поле участвовало в валидации добавляем атрибут data-required
 Особые проверки:
 data-required="email" - вадидация E-mail
-
 Чтобы поле валидировалось при потере фокуса, 
 к атрибуту data-required добавляем атрибут data-validate
-
 Чтобы вывести текст ошибки, нужно указать его в атрибуте data-error
 */
-
+// Объект модулей форм для экспорта
+export const formsModules = {
+	inputMaskModule: null,
+	selectModule: null
+}
 // Модуль плавной прокpутки к блоку
-export let gotoBlock = (targetBlock, noHeader = false, speed = 500, offset = 0) => {
+let gotoBlock = (targetBlock, noHeader = false, speed = 500, offset = 0) => {
 	const targetBlockElement = document.querySelector(targetBlock);
 	if (targetBlockElement) {
 		let headerItem = '';
@@ -169,15 +155,15 @@ export let formValidate = {
 					checkbox.checked = false;
 				}
 			}
-			// if (formsModules.selectModule) {
-			// 	let selects = form.querySelectorAll('.select');
-			// 	if (selects.length) {
-			// 		for (let index = 0; index < selects.length; index++) {
-			// 			const select = selects[index].querySelector('select');
-			// 			formsModules.selectModule.selectBuild(select);
-			// 		}
-			// 	}
-			// }
+			if (formsModules.selectModule) {
+				let selects = form.querySelectorAll('.select');
+				if (selects.length) {
+					for (let index = 0; index < selects.length; index++) {
+						const select = selects[index].querySelector('select');
+						formsModules.selectModule.selectBuild(select);
+					}
+				}
+			}
 		}, 0);
 	},
 	emailTest(formRequiredItem) {
@@ -225,7 +211,7 @@ export function formSubmit(validate) {
 					}
 					formValidate.formClean(form);
 				} else {
-					console.log("Ошибка");
+					alert("Ошибка");
 					form.classList.remove('_sending');
 				}
 			}
@@ -248,8 +234,13 @@ export function formSubmit(validate) {
 		}
 	}
 }
-
-/* Модуь формы "показать пароль" */
+/* Модуль работы с select */
+export function formSelect(logging) {
+	formsModules.selectModule = new SelectConstructor({
+		logging: logging
+	});
+}
+/* Модуль формы "показать пароль" */
 export function formViewpass() {
 	document.addEventListener("click", function (e) {
 		let targetElement = e.target;
@@ -260,7 +251,7 @@ export function formViewpass() {
 		}
 	});
 }
-/* Модуь формы "количество" */
+/* Модуль формы "колличество" */
 export function formQuantity() {
 	document.addEventListener("click", function (e) {
 		let targetElement = e.target;
@@ -276,7 +267,7 @@ export function formQuantity() {
 		}
 	});
 }
-/* Модуь звездного рейтинга */
+/* Модуль звездного рейтинга */
 export function formRating() {
 	const ratings = document.querySelectorAll('.rating');
 	if (ratings.length > 0) {

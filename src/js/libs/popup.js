@@ -1,8 +1,4 @@
-// Модуль попапов
-// Документация по работе в шаблоне: https://template.fls.guru/template-docs/funkcional-popup.html
-// isMobile,
-import {bodyLockStatus, bodyLock, bodyUnlock, bodyLockToggle} from "../script.js";
-// import { isMobile, bodyLockStatus, bodyLockToggle } from "../files/functions.js";
+import { isMobile, bodyLockStatus, bodyLockToggle } from "../functions.js";
 
 export class Popup {
 	constructor(options) {
@@ -278,7 +274,7 @@ export class Popup {
 			if (classInHash) this.open(classInHash)
 		}
 	}
-	// Утсановка хэша
+	// Установка хэша
 	_setHash() {
 		history.pushState('', '', this.hash);
 	}
