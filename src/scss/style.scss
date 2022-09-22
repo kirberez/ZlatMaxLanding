@@ -5,6 +5,7 @@
 // Тут же подключаются шрифты и расположены основные переменные 
 // для настройки семейства и размера шрифта по умолчанию, 
 // цветов, адаптивной сетки, корректной работы миксинов и t.d.
+@use "sass:math";
 // MIXIN подключает наши файлы шрифтов
 @mixin font($font_name, $file_name, $weight, $style) {
 	@font-face {
@@ -16,13 +17,197 @@
 	}
 }
 
+//Percent
+@function percent($px, $from) {
+	$result: math.div($px, $from) * 100%;
+	@return $result;
+}
+//REM
+@function rem($px) {
+	$result: math.div($px, 16) + rem;
+	@return $result;
+}
+//EM
+@function em($px, $current: 16) {
+	$result: math.div($px, $current) + em;
+	@return $result;
+}
+
+// Адаптивное свойство (clamp)
+@mixin adaptiveValue($property, $startSize, $minSize, $widthFrom: $containerWidth, $widthTo: $minWidth, $keepSize: 0) {
+	@if ($startSize==0) {
+		$startSize: 0.000001;
+	}
+	@if ($minSize==0) {
+		$minSize: 0.000001;
+	}
+
+	// Для calc();
+	$addSize: math.div($startSize - $minSize, 16);
+
+	@if ($widthFrom == $containerWidth and $maxWidthContainer == 0) {
+		$widthFrom: $maxWidth;
+	}
+
+	// Брейк-поинты в EM
+	$widthFromMedia: em($widthFrom);
+	$widthToMedia: em($widthTo);
+
+	// Формула плавающего значения
+	// Источник: https://css-tricks.com/linearly-scale-font-size-with-css-clamp-based-on-the-viewport/
+	$slope: math.div(($startSize - $minSize), ($widthFrom - $widthTo));
+	$yIntersection: -$widthTo * $slope + $minSize;
+	@if ($yIntersection==0) {
+		$yIntersection: 0.000001;
+	}
+	$flyValue: #{rem($yIntersection)}" + " #{$slope * 100}vw;
+
+	// Получение значения свойства
+	$propertyValue: #{"clamp(" rem($minSize) "," $flyValue "," rem($startSize) ")"};
+	// Если отрицательные значения
+	@if ($minSize > $startSize) {
+		$propertyValue: #{"clamp(" rem($startSize) "," $flyValue "," rem($minSize) ")"};
+	}
+
+	// Если поддерживается clamp();
+	@supports (#{$property}: $propertyValue) {
+		#{$property}: $propertyValue;
+	}
+	// Если не поддерживается clamp();
+	@supports not (#{$property}: $propertyValue) {
+		#{$property}: calc(#{rem($minSize)} + #{$addSize} * (100vw - #{rem($widthTo)}) / #{math.div($widthFrom, 16) - math.div($widthTo, 16)});
+	}
+
+	// Устанавливаем значения по умолчанию
+	@if $widthFrom != $containerWidth and $widthFrom != $maxWidth and $keepSize != 1 and $keepSize != 2 {
+		@media (min-width: $widthFromMedia) {
+			#{$property}: inherit;
+		}
+	}
+	@if $widthTo != $minWidth and $keepSize != 1 and $keepSize != 3 {
+		@media (max-width: $widthToMedia) {
+			#{$property}: inherit;
+		}
+	}
+}
+
 @import url("https://fonts.googleapis.com/css?family=Montserrat:500,600,700&display=swap");
 
 
-// ***** Убедиться в том что путь правильный!!!!
+$fontFamily: "Montserrat";
+$fontSize: rem(18); // где 14(px) - размер шрифта по умолчанию из макета
+$minWidth: 320; // Минимальная ширина страницы
+$maxWidth: 1920; // Ширина полотна (макета)
+$maxWidthContainer: 1590; // Ширина ограничивающего контейнера (0 = нет ограничения)
+$containerPadding: 30; // Общий отступ у контейнера
+$containerWidth: $maxWidthContainer + $containerPadding;
+$mainColor: #000;
+$mainDarkColor: #141414;
+
+// Обнуление и общие параметры ============================================================================================================================================================================================== =============================================================================================== ===============================================================================================
+@import "null";
+
+body {
+	font-weight: 500;
+	// Скролл заблокирован
+	.lock & {
+		overflow: hidden;
+		touch-action: none;
+	}
+}
+// Оболочка ============================================================================================================================================================================================================================================================================================================================================================================================================================================
+.wrapper {
+	min-height: 100%;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	// Прижимаем footer
+	> main {
+		flex: 1 1 auto;
+	}
+	// Фикс для слайдеров
+	> * {
+		min-width: 0;
+	}
+}
+// Ограничивающий контейнер ======================================================================================================================================================================================================================
+[class*="__container"] {
+  @if ($maxWidthContainer>0) {
+    max-width: rem($maxWidthContainer);
+    box-sizing: content-box;
+    margin: 0 auto;
+  }
+  @if ($containerPadding>0) {
+    padding: 0 $containerPadding + px;
+  }
+}
+// Стили для отзывчивых картинок (IBG)
+[class*="-ibg"] {
+	position: relative;
+	img {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+		object-fit: cover;
+	}
+}
+[class*="-ibg_contain"] {
+	img {
+		object-fit: contain;
+	}
+}
+
+
+
 // Подключить если есть локальные файлы шрифтов
 @import "fonts";
 // Подключение иконочных шрифтов
 @import "fonts/icons"; // Подключить если есть файл иконочного шрифта
+// Подключить ползунок nouislider
+@import "range";
+
+@import "header";
+@import "main";
+@import "footer";
+@import "catalog";
+@import "product";
+@import "common"; // повторяющийся код
+
+@import "select";
+@import "popup";
+@import "quantity";
+@import "tippy";
+@import "swiper";
+
+// Рейтинг
+@import "rating";
 
 
+.breadcrumbs {
+	white-space: nowrap;
+	overflow: auto;
+	height: rem(22);
+	// .breadcrumbs__list
+	&__list {
+		display: flex;
+	}
+	// .breadcrumbs__link
+	&__link {
+		opacity: 0.5;
+		display: flex;
+		align-items: center;
+		&::after {
+			content: "\e900";
+			@extend %ic;
+			transform: rotate(-90deg);
+			font-size: rem(6);
+			margin: 0px em(10, 6);
+		}
+	}
+	// .breadcrumbs__current
+	&__current {
+		color: #E8AA31;
+	}
+}
